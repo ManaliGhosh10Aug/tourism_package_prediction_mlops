@@ -1,0 +1,193 @@
+name: Tourism Package MLOps Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "models/**"
+      - "screenshots/**"
+
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+
+  # ==========================================================
+  # JOB 1 - DATA PREPARATION
+  # ==========================================================
+  data-preparation:
+    name: 1 - Data Registration and Preparation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate registered dataset
+        run: python src/validate_data.py --input data/tourism.csv
+
+      - name: Clean data and create train/test splits
+        run: |
+          python src/prepare_data.py \
+            --input data/tourism.csv \
+            --output-dir artifacts/data
+
+      - name: Upload train/test workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prepared-data
+          path: artifacts/data/
+          retention-days: 7
+
+
+  # ==========================================================
+  # JOB 2 - MODEL TRAINING + MLFLOW
+  # ==========================================================
+  model-training:
+    name: 2 - Model Tuning, Tracking and Evaluation
+    runs-on: ubuntu-latest
+    needs: data-preparation
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download train/test workflow artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: prepared-data
+          path: artifacts/data
+
+      - name: Tune model, log experiments and evaluate
+        run: |
+          python src/train_model.py \
+            --train artifacts/data/train.csv \
+            --test artifacts/data/test.csv \
+            --model-out artifacts/model/best_model.pkl \
+            --metrics-out artifacts/model/metrics.json \
+            --cv-out artifacts/model/cv_results.csv \
+            --config-out artifacts/model/feature_config.json \
+            --tracking-uri sqlite:///mlflow.db
+
+      - name: Verify the saved model loads successfully
+        run: |
+          python - <<'PY'
+          import joblib
+
+          model = joblib.load("artifacts/model/best_model.pkl")
+
+          print("MODEL LOAD CHECK: PASSED")
+          print("Model type:", type(model))
+          PY
+
+      - name: Upload trained model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-model
+          path: artifacts/model/
+          retention-days: 7
+
+      - name: Upload MLflow tracking data
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlflow-tracking
+          path: |
+            mlflow.db
+            mlartifacts/
+            mlruns/
+          retention-days: 7
+          if-no-files-found: warn
+
+
+  # ==========================================================
+  # JOB 3 - CODE VALIDATION
+  # ==========================================================
+  validation:
+    name: 3 - Code Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate Python syntax
+        run: python -m py_compile app.py src/*.py
+
+
+  # ==========================================================
+  # JOB 4 - COMMIT BEST MODEL TO MAIN
+  # ==========================================================
+  commit-best-model:
+    name: 4 - Commit Best Model to Main
+    runs-on: ubuntu-latest
+    needs:
+      - model-training
+      - validation
+
+    # Run for a push to main OR a manual Run workflow on main.
+    # Do not commit model files from pull-request validation runs.
+    if: >
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download trained model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: trained-model
+          path: artifacts/model
+
+      - name: Copy final deployment files
+        run: |
+          mkdir -p models
+          cp artifacts/model/best_model.pkl models/best_model.pkl
+          cp artifacts/model/metrics.json models/metrics.json
+          cp artifacts/model/cv_results.csv models/cv_results.csv
+          cp artifacts/model/feature_config.json models/feature_config.json
+
+      - name: Commit updates only after successful jobs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add models/
+
+          if git diff --cached --quiet; then
+            echo "No model updates to commit."
+          else
+            git commit -m "chore: update best trained model [skip ci]"
+            git push origin HEAD:main
+          fi

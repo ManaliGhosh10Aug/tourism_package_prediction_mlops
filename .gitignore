@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+mlruns/
+artifacts/data/*
+artifacts/model/*
+!artifacts/data/.gitkeep
+!artifacts/model/.gitkeep

@@ -1,0 +1,144 @@
+{
+  "Unnamed: 0": {
+    "type": "numeric",
+    "min": 1.0,
+    "max": 4887.0,
+    "median": 2600.5,
+    "is_integer": true
+  },
+  "Age": {
+    "type": "numeric",
+    "min": 18.0,
+    "max": 61.0,
+    "median": 36.0,
+    "is_integer": false
+  },
+  "TypeofContact": {
+    "type": "categorical",
+    "values": [
+      "Company Invited",
+      "Self Enquiry"
+    ]
+  },
+  "CityTier": {
+    "type": "numeric",
+    "min": 1.0,
+    "max": 3.0,
+    "median": 1.0,
+    "is_integer": true
+  },
+  "DurationOfPitch": {
+    "type": "numeric",
+    "min": 5.0,
+    "max": 127.0,
+    "median": 14.0,
+    "is_integer": false
+  },
+  "Occupation": {
+    "type": "categorical",
+    "values": [
+      "Free Lancer",
+      "Large Business",
+      "Salaried",
+      "Small Business"
+    ]
+  },
+  "Gender": {
+    "type": "categorical",
+    "values": [
+      "Female",
+      "Male"
+    ]
+  },
+  "NumberOfPersonVisiting": {
+    "type": "numeric",
+    "min": 1.0,
+    "max": 5.0,
+    "median": 3.0,
+    "is_integer": true
+  },
+  "NumberOfFollowups": {
+    "type": "numeric",
+    "min": 1.0,
+    "max": 6.0,
+    "median": 4.0,
+    "is_integer": false
+  },
+  "ProductPitched": {
+    "type": "categorical",
+    "values": [
+      "Basic",
+      "Deluxe",
+      "King",
+      "Standard",
+      "Super Deluxe"
+    ]
+  },
+  "PreferredPropertyStar": {
+    "type": "numeric",
+    "min": 3.0,
+    "max": 5.0,
+    "median": 3.0,
+    "is_integer": false
+  },
+  "MaritalStatus": {
+    "type": "categorical",
+    "values": [
+      "Divorced",
+      "Married",
+      "Single"
+    ]
+  },
+  "NumberOfTrips": {
+    "type": "numeric",
+    "min": 1.0,
+    "max": 21.0,
+    "median": 3.0,
+    "is_integer": false
+  },
+  "Passport": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 1.0,
+    "median": 0.0,
+    "is_integer": true
+  },
+  "PitchSatisfactionScore": {
+    "type": "numeric",
+    "min": 1.0,
+    "max": 5.0,
+    "median": 3.0,
+    "is_integer": true
+  },
+  "OwnCar": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 1.0,
+    "median": 1.0,
+    "is_integer": true
+  },
+  "NumberOfChildrenVisiting": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 3.0,
+    "median": 1.0,
+    "is_integer": false
+  },
+  "Designation": {
+    "type": "categorical",
+    "values": [
+      "AVP",
+      "Executive",
+      "Manager",
+      "Senior Manager",
+      "VP"
+    ]
+  },
+  "MonthlyIncome": {
+    "type": "numeric",
+    "min": 1000.0,
+    "max": 98678.0,
+    "median": 22403.0,
+    "is_integer": false
+  }
+}
