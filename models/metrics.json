@@ -1,26 +1,26 @@
 {
-  "accuracy": 0.8946731234866828,
-  "precision": 0.8103448275862069,
-  "recall": 0.5911949685534591,
-  "f1": 0.6836363636363636,
-  "roc_auc": 0.9478374020536902,
-  "best_cv_f1": 0.6807287129833047,
+  "accuracy": 0.9225181598062954,
+  "precision": 0.8467153284671532,
+  "recall": 0.7295597484276729,
+  "f1": 0.7837837837837838,
+  "roc_auc": 0.9672946545595127,
+  "best_cv_f1": 0.7899086543121454,
   "best_params": {
-    "model__max_depth": 12,
+    "model__max_depth": "None",
     "model__max_features": "sqrt",
     "model__min_samples_leaf": 1,
-    "model__min_samples_split": 5,
+    "model__min_samples_split": 2,
     "model__n_estimators": 350
   },
   "confusion_matrix": [
     [
-      645,
-      22
+      646,
+      21
     ],
     [
-      65,
-      94
+      43,
+      116
     ]
   ],
-  "mlflow_parent_run_id": "e3f4d6cd9ecd4fa2afdf73c023f37727"
+  "mlflow_parent_run_id": "c9313b650780496c81f491069b0fb575"
 }
